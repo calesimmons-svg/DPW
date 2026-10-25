@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DPW Hero</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root{
+  --bg:#f3f4f6;--card:#fff;--ink:#111;--muted:#555;--line:#111;--accent:#1d4ed8;--auto:#dcfce7;--autoink:#14532d;--der:#fef3c7;--derink:#78350f;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#0b0f14;--card:#151b23;--ink:#e8edf2;--muted:#9aa7b4;--line:#c9d1d9;--accent:#60a5fa;--auto:#14391f;--autoink:#bbf7d0;--der:#3b2f0b;--derink:#fde68a}
+}
+:root[data-theme="dark"]{--bg:#0b0f14;--card:#151b23;--ink:#e8edf2;--muted:#9aa7b4;--line:#c9d1d9;--accent:#60a5fa;--auto:#14391f;--autoink:#bbf7d0;--der:#3b2f0b;--derink:#fde68a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:14px}
+h1{margin:0 0 4px;font-size:22px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:10px}
+.drop{border:2px dashed var(--accent);border-radius:10px;padding:16px;text-align:center;background:var(--card);cursor:pointer}
+.drop.over{background:var(--auto)}
+.drop b{color:var(--accent)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;align-items:center}
+button{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px 14px;font-size:14px;cursor:pointer}
+button.sec{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+label.opt{font-size:13px;display:inline-flex;gap:4px;align-items:center}
+select{padding:7px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px;max-width:100%}
+.status{font-size:13px;margin:6px 0;color:var(--muted)}
+.tabs{display:flex;gap:6px;margin:12px 0 4px;flex-wrap:wrap}
+.tab{background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:8px;padding:8px 14px;font-weight:700}
+.tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tab small{display:block;font-weight:500;font-size:11px;opacity:.85}
+.wxline{font:13px ui-monospace,Menlo,monospace;background:var(--card);border-left:4px solid var(--accent);border-radius:6px;padding:8px 10px;margin:6px 0;display:none;word-break:break-word}
+.rwybar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--card);border-radius:10px;padding:10px;margin:8px 0}
+.rwybar b{font-size:14px}
+.ws{background:var(--card);border:3px solid var(--line);margin-top:10px}
+.row{display:grid;border-top:2px solid var(--line)}
+.cell{border-left:1px solid var(--line);padding:3px 6px 6px;min-height:62px}
+.cell:first-child{border-left:0}
+.cell label{font-size:11px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:.02em}
+.cell input[type=text]{width:100%;border:0;background:transparent;color:var(--ink);font-size:20px;font-weight:600;padding:4px 0;outline:none;min-width:0}
+.cell input.auto{background:var(--auto);color:var(--autoink)}
+.cell input.derived{background:var(--der);color:var(--derink)}
+.title{text-align:center;font-weight:800;font-size:19px;padding:6px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.title input{width:76px;border:1px solid var(--line);background:transparent;color:var(--ink);font-weight:700;font-size:16px;text-transform:uppercase;padding:2px 4px;text-align:center}
+.title input.auto{background:var(--auto);color:var(--autoink)}
+.note{text-align:center;font-size:14px;padding:3px}
+.sec-h{text-align:center;font-weight:800;font-size:17px;padding:3px;border-top:2px solid var(--line)}
+.r6{grid-template-columns:repeat(6,1fr)}
+.wx4{grid-template-columns:repeat(4,1fr)}
+.w{grid-column:span 2}
+.chk{display:inline-flex;align-items:center;gap:3px;font-size:11px;margin-right:6px}
+.chk input{width:16px;height:16px}
+.foot{display:flex;justify-content:space-between;font-size:15px;padding:4px 6px;border-top:3px solid var(--line)}
+.calc{margin-top:10px;background:var(--card);border-radius:10px;padding:12px;font-size:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.calc b{display:block;font-size:20px}
+.legend{font-size:12px;color:var(--muted);margin-top:8px}
+.legend span{padding:1px 6px;border-radius:4px;margin-right:6px}
+details{margin-top:10px;background:var(--card);border-radius:10px;padding:10px 12px;font-size:13px}
+pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6px 0 0}
+.log li{margin:2px 0}
+@media(max-width:760px){
+  .r6,.wx4{grid-template-columns:repeat(2,1fr)}
+  .cell{border-top:1px solid var(--line)}
+}
+@media print{
+  body{background:#fff;color:#000}.noprint{display:none!important}
+  .ws{margin:0;border-color:#000}
+  .cell input.auto,.cell input.derived,.title input.auto{background:transparent;color:#000}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="noprint">
+    <h1>DPW Hero</h1>
+    <div class="sub">C-5M Departure Planning Worksheet. Upload crew papers and it pulls the airports and weather, then lets you pick a runway.</div>
+    <div class="drop" id="drop">
+      <b>Tap or drop crew papers here</b><br><span class="sub">PDF or TXT</span>
+      <input type="file" id="file" accept=".pdf,.txt,.csv,.json,.md,.log,text/*,application/pdf,application/json" hidden>
+    </div>
+    <div class="status" id="status"></div>
+    <div class="btns">
+      <button id="getRwys">Load runway data</button>
+    </div>
+    <div class="btns">
+      <span class="sub" style="margin:0"><b>Weather source:</b></span><button class="tab on" id="srcCfp">CFP data</button><button class="tab" id="srcMetar">Current METAR</button>
+      
+      
+      <button class="sec" id="clear">Clear</button>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <div class="wxline" id="wxline"></div>
+    <div class="wxline" id="metarline" style="border-left-color:#16a34a"></div>
+    <div class="rwybar">
+      <b>Runway</b>
+      <select id="rwySel"><option value="">Select runway…</option></select>
+      <span class="sub" id="rwyNote" style="margin:0"></span><span class="sub" id="slopeNote" style="margin:0"></span>
+    </div>
+  </div>
+
+  <div class="ws" id="ws">
+    <div class="title">ICAO <input type="text" id="icao" data-k="icao" maxlength="4"> C-5M DEPARTURE PLANNING WORKSHEET</div>
+    <div class="note">Use the AMC C-5M Departure Planning Checklist when completing this worksheet.</div>
+    <div class="sec-h">WEATHER</div>
+    <div class="row wx4" style="border-top:1px solid var(--line)">
+      <div class="cell"><label>Temperature °C</label><input type="text" inputmode="decimal" data-k="temp"></div>
+      <div class="cell"><label>Pressure Altitude</label><input type="text" inputmode="numeric" data-k="pa"></div>
+      <div class="cell"><label>Wind Direction</label><input type="text" inputmode="numeric" data-k="wdir"></div>
+      <div class="cell"><label>Velocity / G</label>
+        <div style="display:flex;gap:6px;align-items:center"><input type="text" inputmode="numeric" data-k="wvel"><span>G</span><input type="text" inputmode="numeric" data-k="wgust"></div></div>
+    </div>
+    <div class="sec-h">RUNWAY AND AIRFIELD INFORMATION</div>
+    <div class="row r6" style="border-top:1px solid var(--line)">
+      <div class="cell"><label>Runway Heading</label><input type="text" inputmode="numeric" data-k="rwyHdg"></div>
+      <div class="cell"><label>Runway Length</label><input type="text" inputmode="numeric" data-k="rwyLen"></div>
+      <div class="cell w"><label>VR Runway Length (if different)</label><input type="text" inputmode="numeric" data-k="vrLen"></div>
+      <div class="cell w"><label>Slope</label><input type="text" inputmode="decimal" data-k="slope">
+        <label class="chk"><input type="radio" name="ud" data-k="up">Up</label>
+        <label class="chk"><input type="radio" name="ud" data-k="dn">Dn</label></div>
+    </div>
+    <div class="row r6" style="border-top:1px solid var(--line)">
+      <div class="cell"><label>Field Elevation</label><input type="text" inputmode="numeric" data-k="fieldElev"></div>
+      <div class="cell"><label>Runway Elevation</label><input type="text" inputmode="numeric" data-k="rwyElev"></div>
+      <div class="cell w"><label>RCR</label><input type="text" inputmode="numeric" data-k="rcr"></div>
+      <div class="cell"><label>RSC</label><input type="text" data-k="rsc"></div>
+      <div class="cell"><label>Screen Height</label><input type="text" inputmode="numeric" data-k="screen"></div>
+    </div>
+    <div class="row r6" style="border-top:1px solid var(--line)">
+      <div class="cell"><label>* Min Climb Gradient</label><input type="text" inputmode="decimal" data-k="mcg1"></div>
+      <div class="cell"><label>* Min Climb Gradient 2</label><input type="text" inputmode="decimal" data-k="mcg2"></div>
+      <div class="cell"><label>† ATC Climb Gradient</label><input type="text" inputmode="decimal" data-k="atc"></div>
+      <div class="cell"><label>Obstacle Height (MSL)</label><input type="text" inputmode="numeric" data-k="obsHt"></div>
+      <div class="cell w"><label>Missed App Climb Gradient</label><input type="text" inputmode="decimal" data-k="mag"></div>
+    </div>
+    <div class="row r6" style="border-top:1px solid var(--line)">
+      <div class="cell"><label>* Altitude (MSL)</label><input type="text" inputmode="numeric" data-k="alt1"></div>
+      <div class="cell"><label>* Altitude (MSL)</label><input type="text" inputmode="numeric" data-k="alt2"></div>
+      <div class="cell"><label>† Altitude (MSL)</label><input type="text" inputmode="numeric" data-k="alt3"></div>
+      <div class="cell"><label>Obstacle Distance</label><input type="text" inputmode="numeric" data-k="obsDist"></div>
+      <div class="cell w"><label>Altitude (MSL)</label><input type="text" inputmode="numeric" data-k="magAlt"></div>
+    </div>
+    <div class="foot"><span>HQ AMC/A3V</span><span>15 June 2016</span></div>
+  </div>
+
+  <div class="legend noprint"><span style="background:var(--auto);color:var(--autoink)">green</span>read from your file or runway data
+    <span style="background:var(--der);color:var(--derink)">amber</span>derived (field elevation from PA and altimeter), verify
+  </div>
+  <div class="calc" id="calc"></div>
+
+</div>
+
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s)};
+  var fields={};
+  document.querySelectorAll('[data-k]').forEach(function(el){fields[el.dataset.k]=el});
+  var ROLES=['DEP','ARR'];
+  var ROLENAME={DEP:'Takeoff',ARR:'Dest'};
+  function blank(){return {icao:'',wx:null,metar:null,metarAt:null,metarErr:'',cfp:null,src:'cfp',star:'',chosen:'',plan:'',papersRwys:[],rwys:[],form:null}}
+  var A={DEP:blank(),ARR:blank(),ALT:blank()};
+  var sel='DEP', notam={}, csvText=null;
+  // aviationweather.gov blocks direct browser requests (no CORS header). Paste your Cloudflare Worker URL here,
+  // e.g. 'https://metar-proxy.YOURNAME.workers.dev'. Leave empty to try the direct URL.
+  var METAR_PROXY='https://dpw.cale-simmons.workers.dev/';
+  var RWY_URL='https://davidmegginson.github.io/ourairports-data/runways.csv';
+
+  try{ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }catch(e){}
+
+  function status(msg,warn){var s=$('#status'); s.textContent=msg; s.style.color=warn?'#b45309':'';}
+  function normRwy(s){var m=String(s||'').toUpperCase().match(/^(\d{1,2})([LCR]?)$/); return m?(('0'+m[1]).slice(-2)+m[2]):String(s||'').toUpperCase();}
+
+  /* ---------- form state ---------- */
+  function setField(k,v,cls){
+    var el=fields[k]; if(!el||v===undefined||v===null||v==='') return;
+    if(el.type==='checkbox'||el.type==='radio'){ el.checked=!!v; return; }
+    el.value=v; el.classList.remove('auto','derived'); el.classList.add(cls||'auto');
+  }
+  function clearForm(){
+    Object.keys(fields).forEach(function(k){var el=fields[k];
+      if(el.type==='checkbox'||el.type==='radio') el.checked=false; else {el.value=''; el.classList.remove('auto','derived');}});
+  }
+  function collect(){
+    var o={}; Object.keys(fields).forEach(function(k){var el=fields[k];
+      o[k]=(el.type==='checkbox'||el.type==='radio')?el.checked:{v:el.value,c:el.classList.contains('auto')?'auto':(el.classList.contains('derived')?'derived':'')};});
+    return o;
+  }
+  function saveForm(){A[sel].form=collect();}
+  function loadForm(){
+    clearForm(); var f=A[sel].form; if(!f){ if(A[sel].icao) fields.icao.value=A[sel].icao; calc(); return; }
+    Object.keys(f).forEach(function(k){var el=fields[k]; if(!el) return; var x=f[k];
+      if(el.type==='checkbox'||el.type==='radio') el.checked=!!x;
+      else { el.value=x.v; el.classList.remove('auto','derived'); if(x.c) el.classList.add(x.c); }});
+    calc();
+  }
+  function withRole(role,fn){ saveForm(); var old=sel; sel=role; loadForm(); fn(); saveForm(); sel=old; loadForm(); }
+  document.querySelectorAll('input[type=text]').forEach(function(el){
+    el.addEventListener('input',function(){el.classList.remove('auto','derived'); if(el.id==='icao') A[sel].icao=el.value.toUpperCase(); renderTabs(); calc();});
+  });
+
+  /* ---------- tabs ---------- */
+  function renderTabs(){
+    var t=$('#tabs'); t.innerHTML='';
+    ROLES.forEach(function(r){
+      var b=document.createElement('button'); b.className='tab'+(r===sel?' on':'');
+      b.innerHTML=r+' <small>'+(A[r].icao||'—')+(A[r].plan?' · rwy '+A[r].plan:'')+'</small>';
+      b.onclick=function(){ if(r===sel) return; saveForm(); sel=r; loadForm(); renderTabs(); renderRwySel(); renderWx(); };
+      t.appendChild(b);
+    });
+  }
+  function zt(d){ d=d||new Date(); return ('0'+d.getUTCHours()).slice(-2)+('0'+d.getUTCMinutes()).slice(-2)+'Z'; }
+  function renderWx(){
+    var a=A[sel], el=$('#wxline'), ml=$('#metarline'), w=a.cfp;
+    if(w&&w.raw){el.style.display='block'; el.textContent=ROLENAME[sel]+' (CFP): '+w.raw;} else el.style.display='none';
+    if(a.metar){ml.style.display='block'; ml.textContent='METAR Weather: '+a.metar.raw+'   (last updated '+zt(a.metarAt)+(a.metarErr?', refresh failed':'')+')';}
+    else if(a.metarErr){ml.style.display='block'; ml.textContent='METAR Weather: unavailable ('+a.metarErr+')';}
+    else ml.style.display='none';
+    updateSrc();
+  }
+  function updateSrc(){
+    $('#srcCfp').classList.toggle('on',A[sel].src!=='metar');
+    $('#srcMetar').classList.toggle('on',A[sel].src==='metar');
+  }
+
+  /* ---------- runway select ---------- */
+  function rwyList(){
+    var a=A[sel], list=a.rwys&&a.rwys.length?a.rwys:a.papersRwys.map(function(i){return {ident:normRwy(i),len:null,elev:null,width:null,surf:'',disp:0}});
+    return list;
+  }
+  function renderRwySel(){
+    var s=$('#rwySel'), list=rwyList(), plan=normRwy(A[sel].plan);
+    s.innerHTML='<option value="">'+(list.length?'Select runway…':'No runways yet. Load runway data or type manually')+'</option>';
+    list.forEach(function(r){
+      var o=document.createElement('option'); o.value=r.ident;
+      o.textContent=r.ident+(r.len?'  ·  '+Number(r.len).toLocaleString()+' ft'+(r.width?' × '+r.width:''):'')+(r.surf?'  ·  '+r.surf.toLowerCase():'')+(r.disp?'  ·  displaced '+r.disp:'')+(r.ident===plan?'  ★ default':'');
+      s.appendChild(o);
+    });
+    var want=A[sel].chosen||plan; if(want) s.value=want;
+    $('#slopeNote').textContent=A[sel].slopeNote||'';
+    $('#rwyNote').textContent=(A[sel].rwys&&A[sel].rwys.length)?'Runway data: OurAirports. Verify against FLIP/Jepp.':(list.length?'Runway names from papers. Lengths need runway data.':'');
+  }
+  function applyRunway(ident,r,quiet){
+    ident=normRwy(ident); var m=ident.match(/^(\d{2})([LCR]?)$/); if(!m) return; A[sel].chosen=ident;
+    var hdg=parseInt(m[1],10)*10; if(hdg===0) hdg=360;
+    setField('rwyHdg',String(hdg).padStart(3,'0'),'auto');
+    fields.slope.value=''; fields.slope.classList.remove('auto','derived'); fields.up.checked=fields.dn.checked=false; A[sel].slopeNote='';
+    if(r&&r.len) setField('rwyLen',String(r.len),'auto'); else if(!quiet){ fields.rwyLen.value=''; fields.rwyLen.classList.remove('auto','derived'); }
+    if(r&&r.elev!==null&&r.elev!==undefined&&r.elev!=='') { setField('rwyElev',String(Math.round(r.elev)),'auto'); if(!fields.fieldElev.value) setField('fieldElev',String(Math.round(r.elev)),'derived'); }
+    var sl=null, nn=notam[A[sel].icao]||{};
+    if(r&&r.len&&r.elev!=null&&r.opp!=null&&r.elev!==r.opp){ sl=(r.opp-r.elev)/r.len*100; A[sel].slopeNote='Slope from runway-end elevations (OurAirports).'; }
+    else if(r&&r.len&&nn[ident]&&nn[recip(ident)]&&!isNaN(nn[ident].der)&&!isNaN(nn[recip(ident)].der)){ sl=(nn[ident].der-nn[recip(ident)].der)/r.len*100; A[sel].slopeNote='Slope from DER elevations in the departure NOTAMs.'; }
+    if(sl!==null&&Math.abs(sl)>=0.005){ setField('slope',Math.abs(sl).toFixed(2),'derived'); if(sl>0) fields.up.checked=true; else fields.dn.checked=true; } else A[sel].slopeNote='';
+    $('#slopeNote').textContent=A[sel].slopeNote||'';
+    var n=notam[A[sel].icao]&&notam[A[sel].icao][ident];
+    if(n){ if(n.screen) setField('screen',n.screen,'auto'); if(n.mcg) setField('mcg1',n.mcg,'auto'); if(n.alt) setField('alt1',n.alt,'auto'); }
+    if(A[sel].src==='metar'&&A[sel].metar) setRscFromMetar();
+    calc();
+  }
+  $('#rwySel').onchange=function(){
+    var id=this.value; if(!id) return;
+    var r=rwyList().filter(function(x){return x.ident===id})[0];
+    applyRunway(id,r,false);
+  };
+
+  /* ---------- file reading ---------- */
+  async function readPdf(buf){
+    var pdf=await pdfjsLib.getDocument({data:buf}).promise, out='';
+    for(var p=1;p<=pdf.numPages;p++){
+      var pg=await pdf.getPage(p), tc=await pg.getTextContent(), lastY=null, line='';
+      tc.items.forEach(function(it){
+        var y=it.transform[5];
+        if(lastY!==null && Math.abs(y-lastY)>3){ out+=line.trim()+'\n'; line=''; }
+        line+=it.str+' '; lastY=y;
+      });
+      out+=line.trim()+'\n\n';
+    }
+    return out;
+  }
+  async function handleFile(f){
+    if(!f) return;
+    if(/^image\//.test(f.type)){ status('That is an image. Upload the crew papers PDF so the text can be read.',true); return; }
+    status('Reading '+f.name+' …');
+    try{
+      var text='';
+      if(/\.pdf$/i.test(f.name)||f.type==='application/pdf') text=await readPdf(await f.arrayBuffer());
+      else {
+        text=await f.text();
+        if(/\.json$/i.test(f.name)){ try{ var j=JSON.parse(text); if(j&&j.dpwHero2){ loadSaved(j); status('Loaded saved worksheet.'); return; } }catch(e){} }
+      }
+      parsePapers(text,f.name);
+    }catch(err){ console.error(err); status('Could not read that file: '+err.message,true); }
+  }
+
+  /* ---------- parsing crew papers ---------- */
+  function parseWxBlock(b){
+    var o={}, m;
+    m=b.match(/\b([A-Z]{4})\s+(\d{2}\/\d{4}Z)/); if(m){o.icao=m[1]; o.time=m[2];}
+    m=b.match(/\b(\d{3}|VRB)(\d{2,3})(?:G(\d{2,3}))?KT\b/); if(m){o.wdir=m[1]; o.wvel=String(parseInt(m[2],10)); if(m[3]) o.wgust=String(parseInt(m[3],10));}
+    m=b.match(/\bT:\s*(-?\d+)\s*C/); if(m) o.temp=m[1];
+    m=b.match(/ALSTG:\s*(\d{2}\.\d{2})/); if(m) o.alt=parseFloat(m[1]);
+    m=b.match(/\bPA:\s*(-?\d+)\s*ft/i); if(m) o.pa=m[1];
+    m=b.match(/[A-Z]{4}\s+\d{2}\/\d{4}Z[^\n]*?(?=\s+T:\s*-?\d|\n|$)/); if(m) o.raw=m[0].trim();
+    return o;
+  }
+  function setCfpFields(w){
+    if(w.temp) setField('temp',w.temp,'auto');
+    if(w.pa) setField('pa',w.pa,'auto');
+    if(w.wdir) setField('wdir',w.wdir,'auto');
+    if(w.wvel) setField('wvel',w.wvel,'auto');
+    if(w.wgust) setField('wgust',w.wgust,'auto');
+    if(w.pa&&w.alt) setField('fieldElev',String(Math.round(parseFloat(w.pa)-(29.92-w.alt)*1000)),'derived');
+  }
+  function recip(id){
+    var m=normRwy(id).match(/^(\d{2})([LCR]?)$/); if(!m) return id;
+    var n=(parseInt(m[1],10)+18)%36; if(n===0) n=36;
+    return ('0'+n).slice(-2)+({L:'R',R:'L',C:'C'}[m[2]]||'');
+  }
+  function parsePapers(raw,name){
+    var t=raw.replace(/\r/g,'').replace(/[ \t]+/g,' '), found=[], m;
+    A={DEP:blank(),ARR:blank(),ALT:blank()}; notam={};
+
+    // Airports
+    m=t.match(/DEP:\s*([A-Z]{4})\s+ARR:\s*([A-Z]{4})\s+ALT1:\s*([A-Z]{4}|None)/);
+    if(!m) m=t.match(/Itin #\s*Dep\s*Arr\s*Arr Alt 1[^\n]*\n\s*\d+\s+([A-Z]{4})\s+([A-Z]{4})\s+([A-Z]{4})/);
+    if(m){ A.DEP.icao=m[1]; A.ARR.icao=m[2]; }
+
+    // Weather briefing
+    var heads=[['DEP','Takeoff Weather'],['ARR','Dest Weather']], idx={};
+    ['Takeoff Weather','Dest Weather','Alternate Weather','Enroute Weather'].forEach(function(h){idx[h]=t.indexOf(h);});
+    heads.forEach(function(h){
+      var s=idx[h[1]]; if(s<0) return;
+      var e=t.length; Object.keys(idx).forEach(function(k){ if(idx[k]>s && idx[k]<e) e=idx[k]; });
+      var o=parseWxBlock(t.slice(s,e)); if(!o.icao&&!o.wdir) return;
+      A[h[0]].wx=o; if(!A[h[0]].icao&&o.icao) A[h[0]].icao=o.icao;
+    });
+
+    // Planned runways
+    m=t.match(/Departure Groundpath\s*=\s*(\d{1,2}[LCR]?)/); if(m) A.DEP.plan=normRwy(m[1]);
+    m=t.match(/Arrival Groundpath\s*=\s*(\d{1,2}[LCR]?)/); if(m) A.ARR.plan=normRwy(m[1]);
+    m=t.match(/RWY\s+TDT\s+SDP([\s\S]*?)RAMP FUEL/);
+    if(m){ var re=/^\s*(\d{2}[LCR]?)\s?(\*?)\s+\d+/gm, x; while((x=re.exec(m[1]))){ var id=normRwy(x[1]); if(A.DEP.papersRwys.indexOf(id)<0) A.DEP.papersRwys.push(id); if(x[2]==='*') A.DEP.star=id; } }
+    if(!A.DEP.plan && A.DEP.star) A.DEP.plan=A.DEP.star;
+    if(A.ARR.plan) A.ARR.papersRwys=[A.ARR.plan, recip(A.ARR.plan)];
+    if(A.DEP.plan && A.DEP.papersRwys.indexOf(A.DEP.plan)<0) A.DEP.papersRwys.push(A.DEP.plan);
+
+    // NOTAM departure data (screen height / min climb), by airport and runway
+    var hdrs=[], hr=/\b([A-Z]{4})\s+[A-Z][A-Z' ]+?\s*\[Back to Top\]/g, hm;
+    while((hm=hr.exec(t))) hdrs.push({i:hm.index,icao:hm[1]});
+    var nr=/OMNIDIRECTIONAL DEPARTURE RWY\s*(\d{1,2}[LCR]?):?\s+STANDARD WITH DER\s+CROSSING HEIGHT OF\s*(\d+)\s*AGL\/(\d+)\s*MSL(?:\s+AND MIN CLIMB OF\s*[\d.]+%\s*\((\d+)\/NM\)\s*TO\s*(\d+))?/g, nm;
+    while((nm=nr.exec(t))){
+      var ap=null; hdrs.forEach(function(h){ if(h.i<nm.index) ap=h.icao; });
+      if(!ap) ap=A.DEP.icao; if(!ap) continue;
+      notam[ap]=notam[ap]||{};
+      notam[ap][normRwy(nm[1])]={screen:nm[2],der:parseInt(nm[3],10)-parseInt(nm[2],10),mcg:nm[4]||'',alt:nm[5]||''};
+    }
+
+    // Build per-airport forms
+    ROLES.forEach(function(r){
+      var a=A[r]; if(!a.icao) return;
+      sel=r; clearForm(); fields.icao.value=a.icao; fields.icao.classList.add('auto');
+      var w=a.wx; a.cfp=w; a.src='cfp'; if(w) setCfpFields(w);
+      if(a.plan) applyRunway(a.plan,null,true);
+      saveForm();
+      found.push(r+': '+a.icao+(w?' · wind '+w.wdir+'/'+w.wvel+(w.wgust?'G'+w.wgust:'')+' · '+w.temp+'°C · PA '+w.pa:' · no weather found')+(a.plan?' · planned rwy '+a.plan:''));
+    });
+    var nk=Object.keys(notam); if(nk.length){ found.push('Departure NOTAMs found for: '+nk.map(function(k){return k+' ('+Object.keys(notam[k]).join(', ')+')'}).join('; ')); }
+    sel='DEP'; loadForm(); renderTabs(); renderRwySel(); renderWx();
+
+    var n=ROLES.filter(function(r){return A[r].icao}).length;
+    status((name?name+': ':'')+n+' airport'+(n===1?'':'s')+' found. '+(n?'Loading runways…':'Verify against the source.'),!n);
+    if(n){ loadRunways(); ROLES.forEach(function(r){ if(A[r].icao) loadMetar(r,true); }); }
+  }
+
+  /* ---------- runway data (OurAirports) ---------- */
+  function csvLine(l){
+    var out=[],cur='',q=false;
+    for(var i=0;i<l.length;i++){var c=l[i];
+      if(q){ if(c==='"'){ if(l[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+      else if(c==='"') q=true; else if(c===','){out.push(cur);cur='';} else cur+=c; }
+    out.push(cur); return out;
+  }
+  async function loadRunways(){
+    var need=ROLES.map(function(r){return A[r].icao}).filter(Boolean);
+    if(!need.length){ status('Read crew papers or enter an ICAO first.',true); return; }
+    status('Loading runway data for '+need.join(', ')+' …');
+    try{
+      if(!csvText){ var r=await fetch(RWY_URL); if(!r.ok) throw new Error('HTTP '+r.status); csvText=await r.text(); }
+      var lines=csvText.split('\n'), head=csvLine(lines[0]).map(function(h){return h.trim()}), ix={};
+      head.forEach(function(h,i){ix[h]=i;});
+      var got={}; need.forEach(function(k){got[k]=[];});
+      for(var i=1;i<lines.length;i++){
+        var l=lines[i]; if(!l) continue;
+        var hit=null; for(var n=0;n<need.length;n++){ if(l.indexOf('"'+need[n]+'"')>-1){hit=need[n];break;} }
+        if(!hit) continue;
+        var c=csvLine(l); if(c[ix.airport_ident]!==hit) continue;
+        if(c[ix.closed]==='1') continue;
+        var len=parseInt(c[ix.length_ft],10)||null, w=parseInt(c[ix.width_ft],10)||null, surf=c[ix.surface]||'';
+        [['le','he'],['he','le']].forEach(function(p){
+          var id=c[ix[p[0]+'_ident']]; if(!id) return;
+          var el=c[ix[p[0]+'_elevation_ft']], oe=c[ix[p[1]+'_elevation_ft']];
+          got[hit].push({ident:normRwy(id),len:len,width:w,surf:surf,elev:el===''||el===undefined?null:parseFloat(el),opp:oe===''||oe===undefined?null:parseFloat(oe),disp:parseInt(c[ix[p[0]+'_displaced_threshold_ft']],10)||0});
+        });
+      }
+      var summary=[];
+      ROLES.forEach(function(r){
+        var a=A[r]; a.rwys=(got[a.icao]||[]).sort(function(x,y){return x.ident<y.ident?-1:1;});
+        summary.push(a.icao+': '+a.rwys.length+' runway ends');
+      });
+      // apply planned runways with real lengths
+      ROLES.forEach(function(r){
+        var a=A[r]; if(!a.icao||!a.plan||!a.rwys.length) return;
+        var rw=a.rwys.filter(function(x){return x.ident===normRwy(a.plan)})[0]; if(!rw) return;
+        withRole(r,function(){ applyRunway(a.plan,rw,true); });
+      });
+      renderRwySel(); renderTabs(); calc();
+      status('Runway data loaded ('+summary.join('; ')+'). Pick a runway from the list. Verify against FLIP/Jepp.');
+    }catch(err){
+      console.error(err);
+      status('Runway lookup failed ('+err.message+'). Outside requests are blocked in some previews. Open the downloaded file or host it, or type runway length by hand.',true);
+    }
+  }
+  $('#getRwys').onclick=loadRunways;
+
+  /* ---------- live METAR ---------- */
+  function findRsc(raw,rwy){
+    var t=String(raw||'').toUpperCase(), m;
+    m=t.match(/\bRSC\s*[:\/]?\s*([A-Z0-9][A-Z0-9 \/.%-]{0,24}?)(?=\s+(?:RMK|RCR|SLP|\$)|\s*=|$)/);
+    if(m&&m[1].trim()) return m[1].trim();
+    var re=/\bR(\d{2}[LCR]?)\/(CLRD\/\/|[\d\/]{6})/g, g, all=[];
+    while((g=re.exec(t))) all.push({id:normRwy(g[1]),code:g[2]});
+    if(!all.length) return '';
+    var want=normRwy(rwy||'');
+    var pick=all.filter(function(x){return want&&(x.id===want||x.id===recip(want));})[0]||(all.length===1?all[0]:null);
+    if(!pick) return '';
+    var txt=pick.code.indexOf('CLRD')===0?'CLRD':(({'0':'DRY','1':'DAMP','2':'WET','3':'RIME/FROST','4':'DRY SNOW','5':'WET SNOW','6':'SLUSH','7':'ICE','8':'COMPACTED SNOW','9':'FROZEN RUTS'})[pick.code[0]]||'N/R');
+    return txt+((want&&pick.id!==want&&pick.id!==recip(want))||!want?' (R'+pick.id+')':'');
+  }
+  async function loadMetar(role,quiet){
+    var a=A[role];
+    if(!a.icao||!/^[A-Z0-9]{4}$/.test(a.icao)){ if(!quiet) status('Enter a 4-letter ICAO first.',true); return false; }
+    try{
+      var url=METAR_PROXY?METAR_PROXY+(METAR_PROXY.indexOf('?')>-1?'&':'?')+'ids='+a.icao:'https://aviationweather.gov/api/data/metar?ids='+a.icao+'&format=json';
+      var r=await fetch(url);
+      if(r.status===204) throw new Error('no METAR returned');
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      var d=await r.json(); if(!d||!d.length) throw new Error('no METAR returned');
+      var o=d[0]; o.raw=o.rawOb||o.raw_text||''; a.metar=o; a.metarErr=''; a.metarAt=new Date();
+    }catch(err){ console.error(err); a.metarErr=err.message; if(!a.metarAt) a.metar=null; }
+    if(role===sel) renderWx();
+    return !!a.metar;
+  }
+  function setRscFromMetar(){
+    var a=A[sel]; if(!a.metar) return '';
+    fields.rsc.value=''; fields.rsc.classList.remove('auto','derived');
+    var v=findRsc(a.metar.raw,a.chosen||a.plan); if(v) setField('rsc',v,'auto');
+    return v;
+  }
+  function applyMetarToForm(){
+    var a=A[sel], o=a.metar; if(!o) return '';
+    a.src='metar';
+    ['temp','pa','wdir','wvel','wgust'].forEach(function(k){fields[k].value='';fields[k].classList.remove('auto','derived');});
+    if(o.temp!==undefined&&o.temp!==null) setField('temp',String(o.temp),'auto');
+    if(o.wdir!==undefined&&o.wdir!==null) setField('wdir',o.wdir==='VRB'?'VRB':String(o.wdir).padStart(3,'0'),'auto');
+    if(o.wspd!==undefined&&o.wspd!==null) setField('wvel',String(o.wspd),'auto');
+    if(o.wgst) setField('wgust',String(o.wgst),'auto');
+    if(o.elev!==undefined&&o.elev!==null&&!fields.fieldElev.value) setField('fieldElev',String(Math.round(o.elev*3.28084)),'derived');
+    var fe=parseFloat(fields.fieldElev.value);
+    if(o.altim&&!isNaN(fe)) setField('pa',String(Math.round(fe+(29.92-o.altim*0.02953)*1000)),'derived');
+    var rsc=setRscFromMetar();
+    calc(); saveForm(); renderWx(); return rsc;
+  }
+  async function fetchMetar(){
+    var icao=(fields.icao.value||'').trim().toUpperCase();
+    if(!/^[A-Z0-9]{4}$/.test(icao)){ status('Enter a 4-letter ICAO first.',true); return false; }
+    A[sel].icao=icao; status('Fetching METAR for '+icao+' …');
+    var ok=await loadMetar(sel,false);
+    if(!ok){ status('METAR fetch failed ('+A[sel].metarErr+'). '+(METAR_PROXY?'Check the Cloudflare Worker URL.':'aviationweather.gov blocks direct browser requests, so METAR needs the Cloudflare Worker proxy (set METAR_PROXY at the top of the script).'),true); return false; }
+    var rsc=applyMetarToForm();
+    status('Current METAR loaded for '+icao+'. '+(rsc?'RSC: '+rsc+'.':'No RSC in this METAR.')+' Verify against source.');
+    return true;
+  }
+  window.DPW_fetchMetar=fetchMetar;
+  async function autoRefresh(){
+    for(var i=0;i<ROLES.length;i++){
+      var r=ROLES[i]; if(!A[r].icao) continue;
+      var ok=await loadMetar(r,true);
+      if(ok&&A[r].src==='metar') withRole(r,function(){ applyMetarToForm(); });
+    }
+  }
+  setInterval(autoRefresh,60000);
+  $('#srcMetar').onclick=fetchMetar;
+  $('#srcCfp').onclick=function(){
+    var a=A[sel]; if(!a.cfp){ status('No CFP weather for this airport. Read the crew papers first.',true); return; }
+    ['temp','pa','wdir','wvel','wgust'].forEach(function(k){fields[k].value='';fields[k].classList.remove('auto','derived');});
+    if(fields.rsc.classList.contains('auto')){fields.rsc.value='';fields.rsc.classList.remove('auto');}
+    setCfpFields(a.cfp); a.wx=a.cfp; a.src='cfp'; saveForm(); renderWx(); calc(); status('Using CFP weather for '+a.icao+'.');
+  };
+
+  /* ---------- wind components ---------- */
+  function num(k){var v=parseFloat(fields[k].value); return isNaN(v)?null:v;}
+  function cell(l,v){return '<div>'+l+'<b>'+v+'</b></div>'}
+  function calc(){
+    var c=$('#calc'), html='', hdg=num('rwyHdg'), wd=num('wdir'), ws=num('wvel'), wg=num('wgust');
+    if(hdg!==null&&ws!==null&&String(fields.wdir.value).toUpperCase()==='VRB') html+=cell('Wind','Variable '+ws+' kt');
+    if(hdg!==null&&wd!==null&&ws!==null){
+      var comp=function(s){var a=(wd-hdg)*Math.PI/180; return {h:s*Math.cos(a),x:s*Math.sin(a)};};
+      var ht=function(v){var r=Math.round(v); return (r>=0?'HW ':'TW ')+Math.abs(r)}, xw=function(v){var r=Math.round(v); return Math.abs(r)+(r>0?' R':(r<0?' L':''))};
+      var a=comp(ws); html+=cell('Headwind / Tailwind',ht(a.h)+' kt')+cell('Crosswind',xw(a.x)+' kt');
+      if(wg!==null){var g=comp(wg); html+=cell('Gust HW / TW',ht(g.h)+' kt')+cell('Gust crosswind',xw(g.x)+' kt');}
+    }
+    var rl=num('rwyLen'); if(rl!==null) html+=cell('Runway length',rl.toLocaleString()+' ft');
+    c.innerHTML=html; c.style.display=html?'':'none';
+  }
+  Object.keys(fields).forEach(function(k){ fields[k].addEventListener('input',calc); });
+
+  /* ---------- save / load / misc ---------- */
+  function loadSaved(j){
+    saveForm(); A=j.airports; notam=j.notam||{}; sel=j.sel||'DEP';
+    ROLES.forEach(function(r){ if(!A[r]) A[r]=blank(); });
+    loadForm(); renderTabs(); renderRwySel(); renderWx();
+  }
+  $('#clear').onclick=function(){
+    A={DEP:blank(),ARR:blank(),ALT:blank()}; notam={}; sel='DEP'; clearForm();
+    status('');
+    renderTabs(); renderRwySel(); renderWx(); calc();
+  };
+
+  var drop=$('#drop'), inp=$('#file');
+  drop.addEventListener('click',function(){inp.click()});
+  inp.addEventListener('change',function(){handleFile(inp.files[0]); inp.value='';});
+  ['dragover','dragenter'].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.add('over')})});
+  ['dragleave','drop'].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.remove('over')})});
+  drop.addEventListener('drop',function(ev){handleFile(ev.dataTransfer.files[0])});
+
+  // URL automation: ?icao=KSUU
+  (function(){
+    var ic=new URLSearchParams(location.search).get('icao');
+    if(ic){ A.DEP.icao=ic.toUpperCase(); fields.icao.value=A.DEP.icao; renderTabs(); fetchMetar(); loadRunways(); }
+  })();
+  renderTabs(); renderRwySel(); calc();
+})();
+</script>
+</body>
+</html>
